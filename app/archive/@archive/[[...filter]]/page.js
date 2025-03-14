@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import NewsList from "@/components/NewsList/NewsList";
 import { getAvailableNewsMonths, getAvailableNewsYears, getNewsForYear, getNewsForYearAndMonth } from "@/lib/news";
+import { notFound } from "next/navigation";
 
 export default function NewsByYearPage({ params }) {
   const filter = params.filter
@@ -9,6 +10,9 @@ export default function NewsByYearPage({ params }) {
 
   const selectedYear = filter?.[0]
   const selectedMonth = filter?.[1]
+  const invalidPathSegment = filter?.[2]
+
+  if(invalidPathSegment) notFound() // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   let news;
   let links = getAvailableNewsYears()
@@ -29,7 +33,12 @@ export default function NewsByYearPage({ params }) {
     newsContent = <NewsList news={news} />
   }
 
-
+  if(
+      selectedYear && !getAvailableNewsYears().includes(+selectedYear) 
+      || selectedMonth && !getAvailableNewsMonths(selectedYear).includes(+selectedMonth)
+  ) {
+    throw new Error('Invalid filter.')
+  }
   
   return (
     <>
