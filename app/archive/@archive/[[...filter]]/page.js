@@ -12,8 +12,6 @@ export default function NewsByYearPage({ params }) {
   const selectedMonth = filter?.[1]
   const invalidPathSegment = filter?.[2]
 
-  if(invalidPathSegment) notFound() // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
   let news;
   let links = getAvailableNewsYears()
 
@@ -32,10 +30,12 @@ export default function NewsByYearPage({ params }) {
   if(news && news.length > 0) {
     newsContent = <NewsList news={news} />
   }
-
+  
+  if(invalidPathSegment) throw new Error('Invalid path segment. (/archive/year/month)')
+  
   if(
-      selectedYear && !getAvailableNewsYears().includes(+selectedYear) 
-      || selectedMonth && !getAvailableNewsMonths(selectedYear).includes(+selectedMonth)
+    selectedYear && !getAvailableNewsYears().includes(+selectedYear) 
+    || selectedMonth && !getAvailableNewsMonths(selectedYear).includes(+selectedMonth)
   ) {
     throw new Error('Invalid filter.')
   }
