@@ -8,7 +8,5 @@ export default function ModalBackDrop() {
   function HandleBackDropClick() {
     router.back()
   }
-  return (
-    <div className="modal-backdrop" onClick={HandleBackDropClick}/>
-  );
+  return <div className="modal-backdrop" onClick={HandleBackDropClick}/>
 }

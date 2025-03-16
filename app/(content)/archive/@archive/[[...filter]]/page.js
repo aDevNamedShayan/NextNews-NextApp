@@ -1,60 +1,70 @@
 import Link from "next/link";
 
 import NewsList from "@/components/NewsList/NewsList";
-import { getAvailableNewsMonths, getAvailableNewsYears, getNewsForYear, getNewsForYearAndMonth } from "@/lib/news";
-import { notFound } from "next/navigation";
+import {
+  getAvailableNewsMonths,
+  getAvailableNewsYears,
+  getNewsForYear,
+  getNewsForYearAndMonth,
+} from "@/lib/news";
 
-export default function NewsByYearPage({ params }) {
-  const filter = params.filter
-  console.log(filter)
+export default async function NewsByYearPage({ params }) {
+  const filter = params.filter;
+  console.log(filter);
 
-  const selectedYear = filter?.[0]
-  const selectedMonth = filter?.[1]
-  const invalidPathSegment = filter?.[2]
+  const selectedYear = filter?.[0];
+  const selectedMonth = filter?.[1];
+  const invalidPathSegment = filter?.[2];
 
   let news;
-  let links = getAvailableNewsYears()
+  let links = await getAvailableNewsYears();
 
-  if(selectedYear && !selectedMonth) {
-    news = getNewsForYear(selectedYear)
-    links = getAvailableNewsMonths(selectedYear)
+  if (selectedYear && !selectedMonth) {
+    news = await getNewsForYear(selectedYear);
+    links = getAvailableNewsMonths(selectedYear);
   }
 
-  if(selectedYear && selectedMonth) {
-    news = getNewsForYearAndMonth(selectedYear, selectedMonth)
-    links = []
+  if (selectedYear && selectedMonth) {
+    news = await getNewsForYearAndMonth(selectedYear, selectedMonth);
+    links = [];
   }
 
-  let newsContent = <p>Please select a period in order to view the news of that period.</p>
+  let newsContent = (
+    <p>Please select a period in order to view the news of that period.</p>
+  );
 
-  if(news && news.length > 0) {
-    newsContent = <NewsList news={news} />
+  if (news && news.length > 0) {
+    newsContent = <NewsList news={news} />;
   }
-  
-  if(invalidPathSegment) throw new Error('Invalid path segment. (/archive/year/month)')
-  
-  if(
-    selectedYear && !getAvailableNewsYears().includes(+selectedYear) 
-    || selectedMonth && !getAvailableNewsMonths(selectedYear).includes(+selectedMonth)
+
+  if (invalidPathSegment)
+    throw new Error("Invalid path segment. (/archive/year/month)");
+
+  const availableYears = await getAvailableNewsYears()
+
+  if (
+    (selectedYear && !availableYears.includes(selectedYear)) ||
+    (selectedMonth &&
+      !getAvailableNewsMonths(selectedYear).includes(selectedMonth))
   ) {
-    throw new Error('Invalid filter.')
+    throw new Error("Invalid filter.");
   }
-  
+
   return (
     <>
       <header id="archive-header">
         <nav>
           <ul>
-            {links.map(link => {
-              let href = selectedYear 
-                ? `/archive/${selectedYear}/${link}` 
-                : `/archive/${link}`
+            {links.map((link) => {
+              let href = selectedYear
+                ? `/archive/${selectedYear}/${link}`
+                : `/archive/${link}`;
 
               return (
                 <li key={link}>
                   <Link href={href}>{link}</Link>
                 </li>
-              )
+              );
             })}
           </ul>
         </nav>
