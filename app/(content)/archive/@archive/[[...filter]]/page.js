@@ -12,9 +12,12 @@ import {
 async function FilterHeader({ year, month }) {
   const availableYears = await getAvailableNewsYears()
   let links = availableYears;
+  let availableMonths
+
+  if (year) availableMonths = getAvailableNewsMonths(year);
 
   if (year && !month) {
-    links = getAvailableNewsMonths(year);
+    links = availableMonths;
   }
 
   if (year && month) {
@@ -23,7 +26,7 @@ async function FilterHeader({ year, month }) {
   
   if (
     (year && !availableYears.includes(year)) ||
-    (month && !getAvailableNewsMonths(year).includes(month))
+    (month && !availableMonths.includes(month))
   ) {
     throw new Error("Invalid filter.");
   }
